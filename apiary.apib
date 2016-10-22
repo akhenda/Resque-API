@@ -1,0 +1,749 @@
+FORMAT: 1A
+HOST: https://{apiMode}.resque.co.ke/{version}
+
+# Resque API
+## Authentication
+This API uses OAuth v2 Bearer Token for its authentication.
+
+# Group services
+
+## Services [/services{?latitude,longitude}]
+
+### Services [GET]
+The Services endpoint returns information about Resque services offered at a given location. The response includes the display name and other details about each service, and lists the services in the proper display order.
++ Parameters
+    + latitude (number, required)
+
+        Latitude component of location.
+
+    + longitude (number, required)
+
+        Longitude component of location.
+
+
++ Response 200 (application/json)
+    + Attributes (servicesResponse)
+
+
+## Services By Service Id [/services/{service_id}]
+
++ Parameters
+    + service_id (string, required)
+
+
+### ServicesByServiceId [GET]
+Returns information about the Resque service.
+
++ Response 200 (application/json)
+    + Attributes (serviceResponse)
+
+
+
+
+# Group estimates
+
+## Estimates Price [/estimates/price{?end_latitude,end_longitude,start_latitude,start_longitude}]
+
+### EstimatesPrice [GET]
+The Price Estimates endpoint returns an estimated price range for each service offered at a given location. The price estimate is provided as a formatted string with the full price range and the localized currency symbol.
+
+
+
+The response also includes low and high estimates, and the ISO 4217 currency code for situations requiring currency conversion.
++ Parameters
+    + end_latitude (string, required)
+
+        Latitude component of end location.
+
+    + end_longitude (string, required)
+
+        Longitude component of end location.
+
+    + start_latitude (string, required)
+
+        Latitude component of start location.
+
+    + start_longitude (string, required)
+
+        Longitude component of start location.
+
+
++ Response 200 (application/json)
+    + Attributes (priceResponse)
+
+
+
+## Estimates Time [/estimates/time{?start_latitude,start_longitude,customer_uuid,service_id}]
+
+### EstimatesTime [GET]
+The Time Estimates endpoint returns ETAs for all services offered at a given location, with the responses expressed as integers in seconds. We recommend that this endpoint be called every minute to provide the most accurate, up-to-date ETAs.
++ Parameters
+    + start_latitude (number, required)
+
+        Latitude component.
+
+    + start_longitude (number, required)
+
+        Longitude component.
+
+    + customer_uuid (string, optional)
+
+        Unique customer identifier to be used for experience customization.
+
+    + service_id (string, optional)
+
+        Unique identifier representing a specific service for a given latitude & longitude.
+
+
++ Response 200 (application/json)
+    + Attributes (timeResponse)
+
+
+
+
+# Group promotions
+
+## Promotions [/promotions{?end_latitude,end_longitude,start_latitude,start_longitude}]
+
+### Promotions [GET]
+The Promotions endpoint returns information about the promotion that will be available to a new user based on their activity's location. These promotions do not apply for existing users.
++ Parameters
+    + end_latitude (string, required)
+
+        Latitude component of end location.
+
+    + end_longitude (string, required)
+
+        Longitude component of end location.
+
+    + start_latitude (string, required)
+
+        Latitude component of start location.
+
+    + start_longitude (string, required)
+
+        Longitude component of start location.
+
+
++ Response 200 (application/json)
+    + Attributes (promotionsResponse)
+
+
+
+
+# Group me
+
+## Me [/me]
+
+### Me [GET]
+The User Profile endpoint returns information about the Resque user that has authorized with the application.
+
++ Response 200 (application/json)
+    + Attributes (userResponse)
+
+
+
+
+# Group requests
+
+## Requests [/requests{?service_id,end_latitude,end_longitude,start_latitude,start_longitude}]
+
+### Requests [POST]
+The Request endpoint allows a resque to be requested on behalf of a Resque user given their desired service and locations.
++ Parameters
+    + service_id (string, required)
+
+        The unique ID of the service being requested.
+
+    + end_latitude (string, required)
+
+        Latitude component of end location.
+
+    + end_longitude (string, required)
+
+        Longitude component of end location.
+
+    + start_latitude (string, required)
+
+        Latitude component of start location.
+
+    + start_longitude (string, required)
+
+        Longitude component of start location.
+
+
++ Response 200 (application/json)
+    + Attributes (requestsResponse)
+
+
+
+## Requests By Request Id [/requests/{request_id}]
+
++ Parameters
+    + request_id (string, required)
+
+
+### RequestsByRequestId [GET]
+Get the real time status of an ongoing resque that was created using the Resque Request endpoint.
+
++ Response 200 (application/json)
+    + Attributes (requestResponse)
+
+
+### RequestsByRequestId [DELETE]
+Cancel an ongoing Request on behalf of a customer.
+
++ Response 200 
+
+
+
+
+## Requests Receipt By Request Id [/requests/{request_id}/receipt]
+
++ Parameters
+    + request_id (string, required)
+
+
+### RequestsReceiptByRequestId [GET]
+Get the receipt information of the completed request.
+
++ Response 200 (application/json)
+    + Attributes (receiptRequestResponse)
+
+
+
+## Requests Map By Request Id [/requests/{request_id}/map]
+
++ Parameters
+    + request_id (string, required)
+
+
+### RequestsMapByRequestId [GET]
+Get a map with a visual representation of a Request.
+
++ Response 200 (application/json)
+    + Attributes (mapRequestResponse)
+
+
+
+## Requests Estimate [/requests/estimate{?service_id,start_latitude,start_longitude,end_latitude,end_longitude}]
+
+### RequestsEstimate [POST]
+The Request Estimate endpoint allows a resque to be estimated given the desired service and locations. If the location is not provided, only estimated service fee are provided. If the arrival ETA is null, there are no confederates available, but an estimate may still be given to the user.
++ Parameters
+    + service_id (string, required)
+
+        The unique ID of the service being requested.
+
+    + start_latitude (number, required)
+
+        The confederate start latitude.
+
+    + start_longitude (number, required)
+
+        The confederate start longitude.
+
+    + end_latitude (number, optional)
+
+        The final or destination latitude. If not included, only the service fee will be included.
+
+    + end_longitude (number, optional)
+
+        The final or destination longitude. If not included, only the service fee will be included.
+
+
++ Response 200 (application/json)
+    + Attributes (requestEstimateResponse)
+
+
+
+## Requests Current [/requests/current]
+
+### RequestsCurrent [GET]
+Get the real-time details for an ongoing resque operation.
+
+
+
+This endpoint behaves similarly to the GET /requests/{request_id} endpoint but will only return details about a user's current ongoing resque - if any.
+
+
+
+By default, only details about resques your app requested will be returned.
+
++ Response 200 (application/json)
+    + Attributes (requestResponse)
+
+
+### RequestsCurrent [PATCH]
+Update an ongoing request�s location using the Resque Request endpoint. This endpoint is similar to PATCH /requests/{request_id} except you do not need to specify the request ID. This endpoint will only work for resques requested through your app.
+
++ Response 200 
+
+
+
+### RequestsCurrent [DELETE]
+Cancel the user's current resque.
+
+
+
+This endpoint behaves similarly to the DELETE /requests/{request_id} endpoint, except you do not need to provide a request_id. This endpoint can only be used on resques that your app requested.
+
++ Response 200 
+
+
+
++ Response 401 
+
+        Invalid OAuth 2.0 Credentials provided.
+
+
+
+
++ Response 403 
+
+        Forbidden
+
+
+
+
++ Response 404 
+
+        User is not currently on a trip.
+
+
+
+
+
+
+# Group history
+
+## History [/history{?offset,limit}]
+
+### History [GET]
+The User Activity endpoint returns a limited amount of data about a user�s lifetime activity with Resque. The response will include resque times, the city the resques took place in, the duration of past requests, and information about which services were requested.
+
+
+
+The history array in the response will have a maximum length based on the limit parameter. The response value count may exceed limit, therefore subsequent API requests may be necessary.
++ Parameters
+    + offset (number, optional)
+
+        Offset the list of returned results by this amount. Default is zero.
+
+    + limit (number, optional)
+
+        Number of items to retrieve. Default is 5, maximum is 50.
+
+
++ Response 200 (application/json)
+    + Attributes (userHistoryResponse)
+
+
+
+
+# Group payment
+
+## Payment Methods [/payment-methods]
+
+### PaymentMethods [GET]
+The Payment Methods endpoint allows retrieving the list of the user�s available payment methods. These can be leveraged in order to supply a payment_method_id to the POST /requests endpoint.
+
++ Response 200 (application/json)
+    + Attributes (paymentMethodsResponse)
+
+
+
+
+# Group places
+
+## Places By Place Id [/places/{place_id}]
+
++ Parameters
+    + place_id (string, required)
+
+
+### PlacesByPlaceId [GET]
+Retrieve home and work addresses from an Resque user's profile.
+
++ Response 200 (application/json)
+    + Attributes (placesResponse)
+
+
++ Response 404 
+
+        The given place id does not exist
+
+
+
+
++ Response 401 
+
+        The supplied bearer token is invalid.
+
+
+
+
+### PlacesByPlaceId [PUT]
+Update home and work addresses for a Resque user's profile.
+
++ Response 200 
+    + Attributes (object)
+
+
+
+
+# Group users
+
+## Users [/users{?role}]
+
+### Users [GET]
++ Parameters
+    + role (number, optional)
+
+        The role query parameter allows us to query users from different groups.
+
+
++ Response 200 
+    + Attributes (object)
+
+
+
+
+# Data Structures
+
+## servicesResponse (object)
+
+
+### Properties
++ `services` (array[Service], optional) 
+
+
+## Service (object)
+
+
+### Properties
++ `companies` (number, optional) 
++ `description` (string, optional) 
++ `price_details` (PriceDetails, optional) 
++ `image` (string, optional) 
++ `display_name` (string, optional) 
++ `service_id` (string, optional) 
+
+
+## PriceDetails (object)
+
+
+### Properties
++ `duration_unit` (string, optional) 
++ `cost_per_minute` (number, optional) 
++ `service_fees` (array[ServiceFee], optional) 
++ `minimum` (number, optional) 
++ `base` (number, optional) 
++ `cancellation_fee` (number, optional) 
++ `currency_code` (string, optional) 
+
+
+## ServiceFee (object)
+
+
+### Properties
++ `fee` (number, optional) 
++ `name` (string, optional) 
+
+
+## serviceResponse (object)
+
+
+### Properties
++ `companies` (string, optional) 
++ `description` (string, optional) 
++ `price_details` (PriceDetails5, optional) 
++ `image` (string, optional) 
++ `display_name` (string, optional) 
++ `service_id` (string, optional) 
+
+
+## PriceDetails5 (object)
+
+
+### Properties
++ `duration_unit` (string, optional) 
++ `cost_per_minute` (number, optional) 
++ `service_fees` (object, optional) 
++ `minimum` (number, optional) 
++ `base` (number, optional) 
++ `cancellation_fee` (number, optional) 
++ `currency_code` (string, optional) 
+
+
+## priceResponse (object)
+
+
+### Properties
++ `prices` (array[Price], optional) 
+
+
+## Price (object)
+
+
+### Properties
++ `service_id` (string, optional) 
++ `currency_code` (string, optional) 
++ `display_name` (string, optional) 
++ `estimate` (string, optional) 
++ `low_estimate` (number, optional) 
++ `high_estimate` (number, optional) 
++ `duration` (number, optional) 
++ `distance` (number, optional) 
+
+
+## timeResponse (object)
+
+
+### Properties
++ `times` (array[Time], optional) 
+
+
+## Time (object)
+
+
+### Properties
++ `service_id` (string, optional) 
++ `display_name` (string, optional) 
++ `estimate` (number, optional) 
+
+
+## promotionsResponse (object)
+
+
+### Properties
++ `display_text` (string, optional) 
++ `localized_value` (string, optional) 
++ `type` (string, optional) 
+
+
+## userResponse (object)
+
+
+### Properties
++ `first_name` (string, optional) 
++ `last_name` (string, optional) 
++ `email` (string, optional) 
++ `picture` (string, optional) 
++ `promo_code` (string, optional) 
++ `subscribed_services` (array[SubscribedService], optional) 
++ `medical_profile` (array[MedicalProfile], optional) 
++ `uuid` (string, optional) 
+
+
+## SubscribedService (object)
+
+
+### Properties
++ `display_name` (string, optional) 
++ `service_id` (string, optional) 
+
+
+## MedicalProfile (object)
+
+
+### Properties
++ `full_name` (string, optional) 
++ `allergies` (string, optional) 
++ `blood_type` (string, optional) 
++ `more_info` (string, optional) 
++ `profile_id` (string, optional) 
+
+
+## requestsResponse (object)
+
+
+### Properties
++ `request_id` (string, optional) 
++ `service_id` (string, optional) 
++ `status` (string, optional) 
++ `company` (string, optional) 
++ `confederate` (string, optional) 
++ `location` (string, optional) 
++ `eta` (number, optional) 
+
+
+## requestResponse (object)
+
+
+### Properties
++ `request_id` (string, optional) 
++ `service_id` (string, optional) 
++ `status` (string, optional) 
++ `location` (Location, optional) 
++ `confederate_start_location` (ConfederateStartLocation, optional) 
++ `confederate` (Confederate, optional) 
++ `company` (Company, optional) 
++ `eta` (number, optional) 
+
+
+## Location (object)
+
+
+### Properties
++ `latitude` (number, optional) 
++ `longitude` (number, optional) 
++ `bearing` (number, optional) 
+
+
+## ConfederateStartLocation (object)
+
+
+### Properties
++ `latitude` (number, optional) 
++ `longitude` (number, optional) 
++ `eta` (number, optional) 
+
+
+## Confederate (object)
+
+
+### Properties
++ `phone_number` (string, optional) 
++ `rating` (number, optional) 
++ `picture_url` (string, optional) 
++ `name` (string, optional) 
+
+
+## Company (object)
+
+
+### Properties
++ `name` (string, optional) 
++ `description` (string, optional) 
++ `rating` (number, optional) 
++ `picture_url` (string, optional) 
+
+
+## receiptRequestResponse (object)
+
+
+### Properties
++ `request_id` (string, optional) 
++ `charges` (array[Charge], optional) 
++ `charge_adjustments` (array[ChargeAdjustment], optional) 
++ `normal_fee` (string, optional) 
++ `subtotal` (string, optional) 
++ `total_charged` (string, optional) 
++ `total_owed` (string, optional) 
++ `currency_code` (string, optional) 
++ `duration` (string, optional) 
++ `distance` (string, optional) 
++ `distance_label` (string, optional) 
+
+
+## Charge (object)
+
+
+### Properties
++ `name` (string, optional) 
++ `amount` (string, optional) 
++ `type` (string, optional) 
+
+
+## ChargeAdjustment (object)
+
+
+### Properties
++ `name` (string, optional) 
++ `amount` (string, optional) 
++ `type` (string, optional) 
+
+
+## mapRequestResponse (object)
+
+
+### Properties
++ `request_id` (string, optional) 
++ `href` (string, optional) 
+
+
+## requestEstimateResponse (object)
+
+
+### Properties
++ `price` (Price25, optional) 
++ `resque` (Resque, optional) 
++ `arrival_estimate` (number, optional) 
+
+
+## Price25 (object)
+
+
+### Properties
++ `high_estimate` (number, optional) 
++ `minimum` (number, optional) 
++ `low_estimate` (number, optional) 
++ `display` (string, optional) 
++ `currency_code` (string, optional) 
+
+
+## Resque (object)
+
+
+### Properties
++ `service` (string, optional) 
++ `duration_estimate` (number, optional) 
+
+
+## userHistoryResponse (object)
+
+
+### Properties
++ `offset` (number, optional) 
++ `limit` (number, optional) 
++ `count` (number, optional) 
++ `history` (array[History], optional) 
+
+
+## History (object)
+
+
+### Properties
++ `status` (string, optional) 
++ `request_time` (number, optional) 
++ `start_time` (number, optional) 
++ `resque_location` (ResqueLocation, optional) 
++ `end_time` (number, optional) 
++ `duration` (number, optional) 
++ `request_id` (string, optional) 
++ `currency_code` (string, optional) 
++ `service_id` (string, optional) 
+
+
+## ResqueLocation (object)
+
+
+### Properties
++ `latitude` (number, optional) 
++ `longitude` (number, optional) 
++ `display_name` (string, optional) 
+
+
+## paymentMethodsResponse (object)
+
+
+### Properties
++ `payment_methods` (array[PaymentMethod], optional) 
++ `last_used` (string, optional) 
+
+
+## PaymentMethod (object)
+
+
+### Properties
++ `payment_method_id` (string, optional) 
++ `type` (string, optional) 
++ `description` (string, optional) 
+
+
+## placesResponse (object)
+
+
+### Properties
++ `address` (string, optional)
